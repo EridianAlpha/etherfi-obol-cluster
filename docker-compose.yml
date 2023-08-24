@@ -29,21 +29,7 @@ x-vc-template: &vc-template
   image: consensys/teku:${TEKU_VERSION:-23.5.0}
   networks: [cluster]
   restart: unless-stopped
-  command: |
-    validator-client
-    --data-base-path="/opt/data"
-    --beacon-node-api-endpoint="http://node-${NODE_NUMBER}:3600"
-    --metrics-enabled=true
-    --metrics-host-allowlist="*"
-    --metrics-interface="0.0.0.0"
-    --metrics-port="8008"
-    --validators-keystore-locking-enabled=false
-    --network="${NETWORK}"
-    --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
-    --validators-proposer-default-fee-recipient="${FEE_RECIPIENT}"
-    --validators-graffiti="${GRAFFITI}"
   volumes:
-    - .charon/cluster/node${NODE_NUMBER}/validator_keys:/opt/charon/validator_keys
     - ./vc-clients/teku:/opt/data
 
 services:
@@ -85,8 +71,9 @@ services:
   vc-0:
     <<: *vc-template
     depends_on: [node-0]
-    environment:
-      NODE_NUMBER: 0
+    command: ./vc-clients/teku/run_validator.sh 0
+    volumes:
+      - .charon/cluster/node0/validator_keys:/opt/charon/validator_keys
 
   #                        _ _             _
   #  _ __ ___   ___  _ __ (_) |_ ___  _ __(_)_ __   __ _
