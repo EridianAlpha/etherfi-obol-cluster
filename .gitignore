@@ -1,0 +1,14 @@
+.env
+docker-compose.override.yml
+.charon/cluster/
+split_keys/
+
+p2pkey
+keystore*
+
+# Docker persistent data locations
+vc-clients/lighthouse/validators/
+vc-clients/teku/validator/
+vc-clients/teku/logs/
+vc-clients/nimbus/node-nimbus/
+relay/charon-enr-private-key
