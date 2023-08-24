@@ -55,6 +55,7 @@ services:
   node-0:
     <<: *node-template
     environment:
+      <<: *node-env
       CHARON_PRIVATE_KEY_FILE: /opt/charon/.charon/cluster/node0/charon-enr-private-key
       CHARON_LOCK_FILE: /opt/charon/.charon/cluster/node0/cluster-lock.json
       CHARON_JAEGER_SERVICE: node-0
