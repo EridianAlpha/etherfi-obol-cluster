@@ -71,7 +71,7 @@ services:
   vc-0:
     <<: *vc-template
     depends_on: [node-0]
-    command: "chmod +x /opt/data/run_validator.sh && /opt/data/run_validator.sh"
+    entrypoint: /opt/data/run_validator.sh
     environment:
       NODE_NUMBER: 0
     volumes:
