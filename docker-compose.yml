@@ -25,7 +25,7 @@ x-node-template: &node-template
   ports:
     - ${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}:${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}/tcp
 
-#x-vc-template: &vc-template
+x-vc-template: &vc-template
   image: consensys/teku:${TEKU_VERSION:-23.5.0}
   networks: [cluster]
   restart: unless-stopped
