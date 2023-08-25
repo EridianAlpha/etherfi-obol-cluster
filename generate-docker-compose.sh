@@ -1,6 +1,8 @@
 #!/bin/bash
 
-NODE_COUNT=${1:-0}
+echo "Enter the number of nodes:"
+read NODE_COUNT
+
 DOCKER_COMPOSE_FILE="docker-compose.yml"
 
 generate_node_service() {
@@ -85,6 +87,7 @@ services:
       - ${CHARON_RELAY_P2P_TCP_ADDRESS_PORT}:${CHARON_RELAY_P2P_TCP_ADDRESS_PORT}/tcp
       - ${CHARON_RELAY_PORT}:${CHARON_RELAY_PORT}/tcp
 EOF
+
 
 for (( NODE_NUMBER=0; NODE_NUMBER<=NODE_COUNT; NODE_NUMBER++ ))
 do

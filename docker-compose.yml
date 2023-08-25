@@ -51,7 +51,7 @@ services:
       CHARON_P2P_EXTERNAL_HOSTNAME: node-0
 
   vc-0:
-    image: consensys/teku:23.5.0
+    image: consensys/teku:${TEKU_VERSION:-23.5.0}
     networks: [cluster]
     restart: unless-stopped
     command: |
@@ -63,15 +63,77 @@ services:
       --metrics-interface="0.0.0.0"
       --metrics-port="8008"
       --validators-keystore-locking-enabled=false
-      --network=""
+      --network="${NETWORK}"
       --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
-      --validators-proposer-default-fee-recipient=""
-      --validators-graffiti=""
+      --validators-proposer-default-fee-recipient="${FEE_RECIPIENT}"
+      --validators-graffiti="${GRAFFITI}"
     depends_on: [node-0]
     volumes:
       - ./vc-clients/teku:/opt/data
       - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
       - .charon/cluster/node0/validator_keys:/opt/charon/validator_keys
+  node-1:
+    <<: *node-template
+    environment:
+      <<: *node-env
+      CHARON_PRIVATE_KEY_FILE: /opt/charon/.charon/cluster/node1/charon-enr-private-key
+      CHARON_LOCK_FILE: /opt/charon/.charon/cluster/node1/cluster-lock.json
+      CHARON_JAEGER_SERVICE: node-1
+      CHARON_P2P_EXTERNAL_HOSTNAME: node-1
+
+  vc-1:
+    image: consensys/teku:${TEKU_VERSION:-23.5.0}
+    networks: [cluster]
+    restart: unless-stopped
+    command: |
+      validator-client
+      --data-base-path="/opt/data"
+      --beacon-node-api-endpoint="http://node-1:3600"
+      --metrics-enabled=true
+      --metrics-host-allowlist="*"
+      --metrics-interface="0.0.0.0"
+      --metrics-port="8008"
+      --validators-keystore-locking-enabled=false
+      --network="${NETWORK}"
+      --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
+      --validators-proposer-default-fee-recipient="${FEE_RECIPIENT}"
+      --validators-graffiti="${GRAFFITI}"
+    depends_on: [node-1]
+    volumes:
+      - ./vc-clients/teku:/opt/data
+      - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
+      - .charon/cluster/node1/validator_keys:/opt/charon/validator_keys
+  node-2:
+    <<: *node-template
+    environment:
+      <<: *node-env
+      CHARON_PRIVATE_KEY_FILE: /opt/charon/.charon/cluster/node2/charon-enr-private-key
+      CHARON_LOCK_FILE: /opt/charon/.charon/cluster/node2/cluster-lock.json
+      CHARON_JAEGER_SERVICE: node-2
+      CHARON_P2P_EXTERNAL_HOSTNAME: node-2
+
+  vc-2:
+    image: consensys/teku:${TEKU_VERSION:-23.5.0}
+    networks: [cluster]
+    restart: unless-stopped
+    command: |
+      validator-client
+      --data-base-path="/opt/data"
+      --beacon-node-api-endpoint="http://node-2:3600"
+      --metrics-enabled=true
+      --metrics-host-allowlist="*"
+      --metrics-interface="0.0.0.0"
+      --metrics-port="8008"
+      --validators-keystore-locking-enabled=false
+      --network="${NETWORK}"
+      --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
+      --validators-proposer-default-fee-recipient="${FEE_RECIPIENT}"
+      --validators-graffiti="${GRAFFITI}"
+    depends_on: [node-2]
+    volumes:
+      - ./vc-clients/teku:/opt/data
+      - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
+      - .charon/cluster/node2/validator_keys:/opt/charon/validator_keys
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v2.41.0}
     volumes:
