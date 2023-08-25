@@ -30,9 +30,9 @@ x-vc-template: &vc-template
   networks: [cluster]
   restart: unless-stopped
   entrypoint: /scripts/run_validator.sh
-  volumes:
-    - ./vc-clients/teku:/opt/data
-    - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
+  #volumes:
+  #  - ./vc-clients/teku:/opt/data
+  #  - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
 
 services:
   #       _                                  _ _            _
@@ -77,6 +77,8 @@ services:
       NODE_NUMBER: 0
     volumes:
       - .charon/cluster/node0/validator_keys:/opt/charon/validator_keys
+      - ./vc-clients/teku:/opt/data
+      - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
 
   #                        _ _             _
   #  _ __ ___   ___  _ __ (_) |_ ___  _ __(_)_ __   __ _
