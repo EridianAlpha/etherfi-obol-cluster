@@ -71,7 +71,12 @@ services:
   vc-0:
     <<: *vc-template
     depends_on: [node-0]
-    command: ["/bin/sh", "-c", "/scripts/run_validator.sh 0"]
+    command:
+      [
+        "/bin/sh",
+        "-c",
+        "chmod +x /scripts/run_validator.sh && /scripts/run_validator.sh 0",
+      ]
     volumes:
       - ./vc-clients/teku:/scripts
       - .charon/cluster/node0/validator_keys:/opt/charon/validator_keys
