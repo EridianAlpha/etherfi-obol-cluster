@@ -2,7 +2,7 @@
 
 validator-client \
   --data-base-path="/opt/data" \
-  --beacon-node-api-endpoint="http://node-0:3600" \
+  --beacon-node-api-endpoint="http://node-${NODE_NUMBER}:3600" \
   --metrics-enabled=true \
   --metrics-host-allowlist="*" \
   --metrics-interface="0.0.0.0" \
