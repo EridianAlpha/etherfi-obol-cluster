@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NODE_COUNT=${1:-0}
+DOCKER_COMPOSE_FILE="docker-compose.yml"
 
 generate_node_service() {
   local NODE_NUMBER=$1
@@ -39,7 +40,7 @@ generate_node_service() {
 EOF
 }
 
-cat <<-'EOF'
+cat <<-'EOF' > $DOCKER_COMPOSE_FILE
 version: "3.8"
 
 x-node-base: &node-base
@@ -87,10 +88,10 @@ EOF
 
 for (( NODE_NUMBER=0; NODE_NUMBER<=NODE_COUNT; NODE_NUMBER++ ))
 do
-  generate_node_service $NODE_NUMBER
+  generate_node_service $NODE_NUMBER >> $DOCKER_COMPOSE_FILE
 done
 
-cat <<-'EOF'
+cat <<-'EOF' >> $DOCKER_COMPOSE_FILE
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v2.41.0}
     volumes:
