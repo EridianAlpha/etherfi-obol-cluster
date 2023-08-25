@@ -1,3 +1,45 @@
+#!/bin/bash
+
+NODE_COUNT=${1:-0}
+
+generate_node_service() {
+  local NODE_NUMBER=$1
+  cat <<-EOF
+  node-${NODE_NUMBER}:
+    <<: *node-template
+    environment:
+      <<: *node-env
+      CHARON_PRIVATE_KEY_FILE: /opt/charon/.charon/cluster/node${NODE_NUMBER}/charon-enr-private-key
+      CHARON_LOCK_FILE: /opt/charon/.charon/cluster/node${NODE_NUMBER}/cluster-lock.json
+      CHARON_JAEGER_SERVICE: node-${NODE_NUMBER}
+      CHARON_P2P_EXTERNAL_HOSTNAME: node-${NODE_NUMBER}
+
+  vc-${NODE_NUMBER}:
+    image: consensys/teku:${TEKU_VERSION:-23.5.0}
+    networks: [cluster]
+    restart: unless-stopped
+    command: |
+      validator-client
+      --data-base-path="/opt/data"
+      --beacon-node-api-endpoint="http://node-${NODE_NUMBER}:3600"
+      --metrics-enabled=true
+      --metrics-host-allowlist="*"
+      --metrics-interface="0.0.0.0"
+      --metrics-port="8008"
+      --validators-keystore-locking-enabled=false
+      --network="${NETWORK}"
+      --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
+      --validators-proposer-default-fee-recipient="${FEE_RECIPIENT}"
+      --validators-graffiti="${GRAFFITI}"
+    depends_on: [node-${NODE_NUMBER}]
+    volumes:
+      - ./vc-clients/teku:/opt/data
+      - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
+      - .charon/cluster/node${NODE_NUMBER}/validator_keys:/opt/charon/validator_keys
+EOF
+}
+
+cat <<-'EOF'
 version: "3.8"
 
 x-node-base: &node-base
@@ -41,37 +83,14 @@ services:
     ports:
       - ${CHARON_RELAY_P2P_TCP_ADDRESS_PORT}:${CHARON_RELAY_P2P_TCP_ADDRESS_PORT}/tcp
       - ${CHARON_RELAY_PORT}:${CHARON_RELAY_PORT}/tcp
-  node-0:
-    <<: *node-template
-    environment:
-      <<: *node-env
-      CHARON_PRIVATE_KEY_FILE: /opt/charon/.charon/cluster/node0/charon-enr-private-key
-      CHARON_LOCK_FILE: /opt/charon/.charon/cluster/node0/cluster-lock.json
-      CHARON_JAEGER_SERVICE: node-0
-      CHARON_P2P_EXTERNAL_HOSTNAME: node-0
+EOF
 
-  vc-0:
-    image: consensys/teku:23.5.0
-    networks: [cluster]
-    restart: unless-stopped
-    command: |
-      validator-client
-      --data-base-path="/opt/data"
-      --beacon-node-api-endpoint="http://node-0:3600"
-      --metrics-enabled=true
-      --metrics-host-allowlist="*"
-      --metrics-interface="0.0.0.0"
-      --metrics-port="8008"
-      --validators-keystore-locking-enabled=false
-      --network=""
-      --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
-      --validators-proposer-default-fee-recipient=""
-      --validators-graffiti=""
-    depends_on: [node-0]
-    volumes:
-      - ./vc-clients/teku:/opt/data
-      - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
-      - .charon/cluster/node0/validator_keys:/opt/charon/validator_keys
+for (( NODE_NUMBER=0; NODE_NUMBER<=NODE_COUNT; NODE_NUMBER++ ))
+do
+  generate_node_service $NODE_NUMBER
+done
+
+cat <<-'EOF'
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v2.41.0}
     volumes:
@@ -100,3 +119,4 @@ services:
 
 networks:
   cluster:
+EOF
