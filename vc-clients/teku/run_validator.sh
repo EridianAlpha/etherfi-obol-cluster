@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-validator-client \
+exec validator-client \
   --data-base-path="/opt/data" \
   --beacon-node-api-endpoint="http://node-${NODE_NUMBER}:3600" \
   --metrics-enabled=true \
