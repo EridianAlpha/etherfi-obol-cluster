@@ -16,7 +16,7 @@ generate_node_service() {
       CHARON_P2P_EXTERNAL_HOSTNAME: node-${NODE_NUMBER}
 
   vc-${NODE_NUMBER}:
-    image: consensys/teku:${TEKU_VERSION:-23.5.0}
+    image: consensys/teku:\${TEKU_VERSION:-23.5.0}
     networks: [cluster]
     restart: unless-stopped
     command: |
@@ -28,10 +28,10 @@ generate_node_service() {
       --metrics-interface="0.0.0.0"
       --metrics-port="8008"
       --validators-keystore-locking-enabled=false
-      --network="${NETWORK}"
+      --network="\${NETWORK}"
       --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
-      --validators-proposer-default-fee-recipient="${FEE_RECIPIENT}"
-      --validators-graffiti="${GRAFFITI}"
+      --validators-proposer-default-fee-recipient="\${FEE_RECIPIENT}"
+      --validators-graffiti="\${GRAFFITI}"
     depends_on: [node-${NODE_NUMBER}]
     volumes:
       - ./vc-clients/teku:/opt/data
