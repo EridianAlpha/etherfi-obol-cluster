@@ -1,7 +1,8 @@
 #!/bin/bash
 
-echo "Enter the number of nodes:"
+echo "Enter the number of nodes (starting at 1):"
 read NODE_COUNT
+NODE_COUNT=$((NODE_COUNT - 1))
 
 DOCKER_COMPOSE_FILE="docker-compose.yml"
 
@@ -67,8 +68,8 @@ x-node-template: &node-template
     <<: *node-env
     CHARON_P2P_RELAYS: ${CHARON_P2P_RELAYS}
     CHARON_P2P_TCP_ADDRESS: 0.0.0.0:${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}
-  ports:
-    - ${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}:${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}/tcp
+  #ports:
+    #- ${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}:${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}/tcp
 
 services:
   relay:
