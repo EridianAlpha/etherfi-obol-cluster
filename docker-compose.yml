@@ -29,7 +29,8 @@ x-vc-template: &vc-template
   image: consensys/teku:${TEKU_VERSION:-23.5.0}
   networks: [cluster]
   restart: unless-stopped
-  command: /scripts/run_validator.sh
+  entrypoint: ["/bin/bash", "-c"]
+  command: ["/scripts/run_validator.sh"]
   volumes:
     - ./vc-clients/teku:/opt/data
     - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh

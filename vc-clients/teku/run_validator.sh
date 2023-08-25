@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 validator-client \
   --data-base-path="/opt/data" \
