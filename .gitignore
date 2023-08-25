@@ -7,6 +7,8 @@ split_keys/
 p2pkey
 keystore*
 
+.DS_Store
+
 # Docker persistent data locations
 vc-clients/lighthouse/validators/
 vc-clients/teku/validator/
