@@ -29,8 +29,10 @@ x-vc-template: &vc-template
   image: consensys/teku:${TEKU_VERSION:-23.5.0}
   networks: [cluster]
   restart: unless-stopped
+  entrypoint: /scripts/run_validator.sh
   volumes:
     - ./vc-clients/teku:/opt/data
+    - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
 
 services:
   #       _                                  _ _            _
@@ -71,11 +73,9 @@ services:
   vc-0:
     <<: *vc-template
     depends_on: [node-0]
-    entrypoint: /opt/data/run_validator.sh
     environment:
       NODE_NUMBER: 0
     volumes:
-      - ./vc-clients/teku:/opt/data
       - .charon/cluster/node0/validator_keys:/opt/charon/validator_keys
 
   #                        _ _             _
