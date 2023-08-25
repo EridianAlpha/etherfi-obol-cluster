@@ -5,6 +5,7 @@ read NODE_COUNT
 NODE_COUNT=$((NODE_COUNT - 1))
 
 DOCKER_COMPOSE_FILE="docker-compose.yml"
+PROMETHEUS_CONFIG_FILE="monitoring/prometheus/prometheus.yml"
 
 generate_node_service() {
   local NODE_NUMBER=$1
@@ -40,6 +41,18 @@ generate_node_service() {
       - ./vc-clients/teku:/opt/data
       - ./vc-clients/teku/run_validator.sh:/scripts/run_validator.sh
       - .charon/cluster/node${NODE_NUMBER}/validator_keys:/opt/charon/validator_keys
+EOF
+}
+
+generate_prometheus_config() {
+  local NODE_NUMBER=$1
+  cat <<-EOF
+  - job_name: "node-${NODE_NUMBER}"
+    static_configs:
+      - targets: ["node-${NODE_NUMBER}:3620"]
+  - job_name: "vc-${NODE_NUMBER}"
+    static_configs:
+      - targets: ["vc-${NODE_NUMBER}:8008"]
 EOF
 }
 
@@ -124,4 +137,25 @@ cat <<-'EOF' >> $DOCKER_COMPOSE_FILE
 
 networks:
   cluster:
+EOF
+
+cat <<-'EOF' > $PROMETHEUS_CONFIG_FILE
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+EOF
+
+# Generate the dynamic Prometheus config
+for (( NODE_NUMBER=0; NODE_NUMBER<=NODE_COUNT; NODE_NUMBER++ ))
+do
+  generate_prometheus_config $NODE_NUMBER >> $PROMETHEUS_CONFIG_FILE
+done
+
+# Write the remaining static part of the Prometheus config file
+cat <<-'EOF' >> $PROMETHEUS_CONFIG_FILE
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]
 EOF
