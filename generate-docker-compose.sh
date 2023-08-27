@@ -1,8 +1,16 @@
 #!/bin/bash
 
-echo "Enter the number of nodes (starting at 1):"
-read NODE_COUNT
-NODE_COUNT=$((NODE_COUNT - 1))
+source .env
+
+# Check with the user
+echo "These are the ACTIVE_NODES specified in the .env file: $ACTIVE_NODES"
+echo -n "Are they correct? (y/n): "
+read user_input
+
+if [[ $user_input != 'y' ]]; then
+  echo "Edit the .env file to change the ACTIVE_NODES"
+  exit 1
+fi
 
 DOCKER_COMPOSE_FILE="docker-compose.yml"
 PROMETHEUS_CONFIG_FILE="monitoring/prometheus/prometheus.yml"
@@ -103,8 +111,8 @@ services:
 EOF
 
 
-for (( NODE_NUMBER=0; NODE_NUMBER<=NODE_COUNT; NODE_NUMBER++ ))
-do
+IFS=',' read -ra NODES <<< "$ACTIVE_NODES"
+for NODE_NUMBER in "${NODES[@]}"; do
   generate_node_service $NODE_NUMBER >> $DOCKER_COMPOSE_FILE
 done
 
@@ -148,8 +156,7 @@ scrape_configs:
 EOF
 
 # Generate the dynamic Prometheus config
-for (( NODE_NUMBER=0; NODE_NUMBER<=NODE_COUNT; NODE_NUMBER++ ))
-do
+for NODE_NUMBER in "${NODES[@]}"; do
   generate_prometheus_config $NODE_NUMBER >> $PROMETHEUS_CONFIG_FILE
 done
 
@@ -159,3 +166,5 @@ cat <<-'EOF' >> $PROMETHEUS_CONFIG_FILE
     static_configs:
       - targets: ["node-exporter:9100"]
 EOF
+
+echo "Success! The docker-compose.yml and monitoring/prometheus/prometheus.yml files have been generated."
