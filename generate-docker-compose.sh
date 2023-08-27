@@ -18,6 +18,9 @@ generate_node_service() {
       CHARON_LOCK_FILE: /opt/charon/.charon/cluster/node${NODE_NUMBER}/cluster-lock.json
       CHARON_JAEGER_SERVICE: node-${NODE_NUMBER}
       CHARON_P2P_EXTERNAL_HOSTNAME: node-${NODE_NUMBER}
+      CHARON_P2P_TCP_ADDRESS: 0.0.0.0:\${CHARON_${NODE_NUMBER}_P2P_TCP_ADDRESS_PORT}
+    ports:
+      - \${CHARON_${NODE_NUMBER}_P2P_TCP_ADDRESS_PORT}:\${CHARON_${NODE_NUMBER}_P2P_TCP_ADDRESS_PORT}/tcp
 
   vc-${NODE_NUMBER}:
     image: consensys/teku:\${TEKU_VERSION:-23.5.0}
@@ -80,9 +83,6 @@ x-node-template: &node-template
   environment:
     <<: *node-env
     CHARON_P2P_RELAYS: ${CHARON_P2P_RELAYS}
-    CHARON_P2P_TCP_ADDRESS: 0.0.0.0:${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}
-  #ports:
-    #- ${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}:${CHARON_TEKU_P2P_TCP_ADDRESS_PORT}/tcp
 
 services:
   relay:
