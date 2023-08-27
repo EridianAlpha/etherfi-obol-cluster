@@ -1,8 +1,10 @@
 .env
-docker-compose.yml
-docker-compose.override.yml
 .charon/cluster/
 split_keys/
+docker-compose.override.yml
+
+docker-compose.yml
+monitoring/prometheus/prometheus.yml
 
 p2pkey
 keystore*
