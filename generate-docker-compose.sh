@@ -27,6 +27,7 @@ generate_node_service() {
       CHARON_JAEGER_SERVICE: node-${NODE_NUMBER}
       CHARON_P2P_EXTERNAL_HOSTNAME: node-${NODE_NUMBER}
       CHARON_P2P_TCP_ADDRESS: 0.0.0.0:\${CHARON_${NODE_NUMBER}_P2P_TCP_ADDRESS_PORT}
+      CHARON_BUILDER_API: ${BUILDER_API_ENABLED:-false}
     ports:
       - \${CHARON_${NODE_NUMBER}_P2P_TCP_ADDRESS_PORT}:\${CHARON_${NODE_NUMBER}_P2P_TCP_ADDRESS_PORT}/tcp
 
@@ -47,6 +48,7 @@ generate_node_service() {
       --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
       --validators-proposer-default-fee-recipient="\${FEE_RECIPIENT}"
       --validators-graffiti="\${GRAFFITI}"
+      --validators-proposer-config="http://node-${NODE_NUMBER}:3600/teku_proposer_config"
     depends_on: [node-${NODE_NUMBER}]
     volumes:
       - ./vc-clients/teku:/opt/data
