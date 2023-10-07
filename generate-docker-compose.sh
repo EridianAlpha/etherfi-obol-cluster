@@ -124,6 +124,7 @@ cat <<-'EOF' >> $DOCKER_COMPOSE_FILE
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks: [cluster]
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION:-9.3.2}
@@ -134,16 +135,19 @@ cat <<-'EOF' >> $DOCKER_COMPOSE_FILE
       - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./monitoring/grafana/dashboards:/etc/dashboards
     networks: [cluster]
+    restart: unless-stopped
     ports:
       - "${MONITORING_PORT_GRAFANA}:3000"
 
   node-exporter:
     image: prom/node-exporter:${NODE_EXPORTER_VERSION:-v1.5.0}
     networks: [cluster]
+    restart: unless-stopped
 
   jaeger:
     image: jaegertracing/all-in-one:${JAEGAR_VERSION:-1.41.0}
     networks: [cluster]
+    restart: unless-stopped
 
 networks:
   cluster:
